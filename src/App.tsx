@@ -6,6 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Committees from "./pages/Committees";
+import Meetings from "./pages/Meetings";
+import Documents from "./pages/Documents";
+import ActionItems from "./pages/ActionItems";
+import Settings from "./pages/Settings";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -21,6 +25,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/committees" element={<Committees />} />
+            <Route path="/meetings" element={<Meetings />} />
+            <Route path="/documents" element={<Documents />} />
+            <Route path="/actions" element={<ActionItems />} />
+            <Route path="/settings" element={<Settings />} />
             {/* Other routes would be added here as we develop more pages */}
             <Route path="*" element={<NotFound />} />
           </Routes>
