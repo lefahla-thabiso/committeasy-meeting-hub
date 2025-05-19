@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Define the Committee type with correct structure matching Supabase response
 type Committee = Database['public']['Tables']['committees']['Row'] & {
   chair?: {
     name: string;
@@ -40,7 +41,13 @@ const Committees = () => {
           return;
         }
 
-        setCommittees(data || []);
+        // Transform data to match Committee type
+        const transformedData = data.map(item => ({
+          ...item,
+          member_count: item.member_count?.[0]?.count || 0
+        })) as Committee[];
+
+        setCommittees(transformedData);
       } catch (error) {
         console.error('Error:', error);
       } finally {
