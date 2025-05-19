@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Calendar, PlusCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
+import ScheduleMeetingDialog from "@/components/meetings/ScheduleMeetingDialog";
+import { useToast } from "@/hooks/use-toast";
 
 // Define the Meeting type with correct structure matching Supabase response
 type Meeting = Database['public']['Tables']['meetings']['Row'] & {
@@ -26,40 +28,47 @@ type Meeting = Database['public']['Tables']['meetings']['Row'] & {
 const Meetings = () => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  const fetchMeetings = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('meetings')
+        .select(`
+          *,
+          organizer:organizer_id(name, avatar),
+          committee:committee_id(name),
+          attendee_count:meeting_attendees(count)
+        `)
+        .order('start_time', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching meetings:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load meetings",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Transform data to match Meeting type
+      const transformedData = data.map(item => ({
+        ...item,
+        attendee_count: item.attendee_count?.[0]?.count || 0
+      })) as Meeting[];
+
+      setMeetings(transformedData);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchMeetings = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('meetings')
-          .select(`
-            *,
-            organizer:organizer_id(name, avatar),
-            committee:committee_id(name),
-            attendee_count:meeting_attendees(count)
-          `)
-          .order('start_time', { ascending: true });
-
-        if (error) {
-          console.error('Error fetching meetings:', error);
-          return;
-        }
-
-        // Transform data to match Meeting type
-        const transformedData = data.map(item => ({
-          ...item,
-          attendee_count: item.attendee_count?.[0]?.count || 0
-        })) as Meeting[];
-
-        setMeetings(transformedData);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchMeetings();
   }, []);
 
@@ -83,7 +92,7 @@ const Meetings = () => {
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Meetings</h1>
-          <Button>
+          <Button onClick={() => setScheduleDialogOpen(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Schedule Meeting
           </Button>
@@ -134,7 +143,9 @@ const Meetings = () => {
                     
                     <div className="text-sm">
                       <span className="font-medium">Location: </span>
-                      {meeting.is_virtual ? "Virtual Meeting" : meeting.location || "Not specified"}
+                      {meeting.is_virtual ? 
+                        (meeting.meeting_link || "Virtual Meeting") : 
+                        (meeting.location || "Not specified")}
                     </div>
                     
                     {meeting.committee && (
@@ -170,7 +181,7 @@ const Meetings = () => {
                 <Calendar className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-lg font-medium">No meetings found</h3>
                 <p className="mt-1 text-gray-500">Get started by scheduling a new meeting.</p>
-                <Button className="mt-4">
+                <Button className="mt-4" onClick={() => setScheduleDialogOpen(true)}>
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Schedule Meeting
                 </Button>
@@ -179,6 +190,12 @@ const Meetings = () => {
           </div>
         )}
       </div>
+
+      <ScheduleMeetingDialog
+        open={scheduleDialogOpen}
+        onOpenChange={setScheduleDialogOpen}
+        onSuccess={fetchMeetings}
+      />
     </MainLayout>
   );
 };
