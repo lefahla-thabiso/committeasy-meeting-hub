@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
+import { useAuth } from "@/context/AuthContext";
 
 interface ScheduleMeetingDialogProps {
   open: boolean;
@@ -42,6 +43,7 @@ const ScheduleMeetingDialog = ({
   const [attendees, setAttendees] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +51,15 @@ const ScheduleMeetingDialog = ({
       toast({
         title: "Missing information",
         description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to schedule meetings",
         variant: "destructive",
       });
       return;
@@ -65,13 +76,6 @@ const ScheduleMeetingDialog = ({
       const endDateTime = new Date(date);
       const [endHours, endMinutes] = endTime.split(':').map(Number);
       endDateTime.setHours(endHours, endMinutes);
-
-      // Get current user ID
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        throw new Error("You must be logged in to schedule meetings");
-      }
 
       // Insert meeting into database
       const { data: meetingData, error: meetingError } = await supabase

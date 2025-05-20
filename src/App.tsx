@@ -1,40 +1,38 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import Committees from "./pages/Committees";
-import Meetings from "./pages/Meetings";
-import Documents from "./pages/Documents";
-import ActionItems from "./pages/ActionItems";
-import Settings from "./pages/Settings";
 
-// Create a new QueryClient instance
-const queryClient = new QueryClient();
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import Documents from './pages/Documents';
+import Index from './pages/Index';
+import ActionItems from './pages/ActionItems';
+import Settings from './pages/Settings';
+import Meetings from './pages/Meetings';
+import Committees from './pages/Committees';
+import NotFound from './pages/NotFound';
+import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider } from './context/AuthContext';
+import Auth from './pages/Auth';
+import ProtectedRoute from './components/layout/ProtectedRoute';
 
-// Make sure App is a function component, not a constant using an arrow function
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+            
+          <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Index />} />
-            <Route path="/committees" element={<Committees />} />
             <Route path="/meetings" element={<Meetings />} />
+            <Route path="/committees" element={<Committees />} />
             <Route path="/documents" element={<Documents />} />
-            <Route path="/actions" element={<ActionItems />} />
+            <Route path="/action-items" element={<ActionItems />} />
             <Route path="/settings" element={<Settings />} />
-            {/* Other routes would be added here as we develop more pages */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
+          </Route>
+        </Routes>
+        <Toaster />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

@@ -1,40 +1,52 @@
 
 import React from "react";
+import { MobileMenu } from "@/components/ui/sidebar";
+import { Input } from "@/components/ui/input";
 import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import UserMenu from "./UserMenu";
 
-const TopNav = () => {
+interface TopNavProps {
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+}
+
+const TopNav = ({ sidebarOpen, setSidebarOpen }: TopNavProps) => {
   return (
-    <header className="bg-white border-b border-gray-200 z-20">
-      <div className="px-4 py-3 flex items-center justify-between">
-        <div className="flex-1">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <Input 
-              className="pl-10 pr-4 py-2 w-full rounded-md border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" 
-              placeholder="Search meetings, documents..." 
-            />
+    <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white shadow">
+      <MobileMenu
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        className="border-r border-gray-200 px-4 md:hidden"
+      />
+      <div className="flex flex-1 justify-between px-4">
+        <div className="flex flex-1">
+          <div className="flex w-full md:ml-0">
+            <label htmlFor="search-field" className="sr-only">
+              Search
+            </label>
+            <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <Search className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <Input
+                id="search-field"
+                className="block h-full w-full border-transparent py-2 pl-10 pr-3 text-gray-900 placeholder-gray-500 focus:border-transparent focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:text-sm"
+                placeholder="Search"
+                type="search"
+              />
+            </div>
           </div>
         </div>
-        
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm">
-            + New Meeting
+        <div className="ml-4 flex items-center gap-4">
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <Bell className="h-5 w-5" />
+            <span className="sr-only">View notifications</span>
           </Button>
-          
-          <div className="relative">
-            <Button variant="ghost" size="icon">
-              <Bell size={20} />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center">
-                3
-              </Badge>
-            </Button>
-          </div>
+          <UserMenu />
         </div>
       </div>
-    </header>
+    </div>
   );
 };
 

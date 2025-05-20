@@ -1,20 +1,21 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import Dashboard from "./Dashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/context/AuthContext";
 
 // Using Dashboard component to render content
 const Index = () => {
-  const [upcomingMeetings, setUpcomingMeetings] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchUpcomingMeetings = async () => {
+  const { data: upcomingMeetings, isLoading } = useQuery({
+    queryKey: ['upcomingMeetings', user?.id],
+    queryFn: async () => {
       try {
-        setLoading(true);
         const now = new Date().toISOString();
         
         const { data, error } = await supabase
@@ -29,24 +30,27 @@ const Index = () => {
           .limit(5);
 
         if (error) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch upcoming meetings",
+            variant: "destructive",
+          });
           console.error('Error fetching upcoming meetings:', error);
-          return;
+          return [];
         }
 
-        setUpcomingMeetings(data);
+        return data || [];
       } catch (error) {
         console.error('Error:', error);
-      } finally {
-        setLoading(false);
+        return [];
       }
-    };
-
-    fetchUpcomingMeetings();
-  }, []);
+    },
+    enabled: !!user,
+  });
 
   return (
     <MainLayout>
-      <Dashboard upcomingMeetings={upcomingMeetings} loading={loading} />
+      <Dashboard upcomingMeetings={upcomingMeetings || []} loading={isLoading} />
     </MainLayout>
   );
 };

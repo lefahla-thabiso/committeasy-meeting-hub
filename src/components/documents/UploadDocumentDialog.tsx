@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Upload } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface UploadDocumentDialogProps {
   open: boolean;
@@ -30,6 +31,7 @@ const UploadDocumentDialog = ({
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -47,6 +49,15 @@ const UploadDocumentDialog = ({
       toast({
         title: "Missing information",
         description: "Please provide both a title and a file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to upload documents.",
         variant: "destructive",
       });
       return;
@@ -81,7 +92,7 @@ const UploadDocumentDialog = ({
         .insert({
           title,
           url: fileUrl,
-          uploaded_by: (await supabase.auth.getUser()).data.user?.id || null,
+          uploaded_by: user.id,
           uploaded_at: new Date().toISOString(),
         });
         
