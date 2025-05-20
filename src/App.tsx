@@ -5,6 +5,7 @@ import Index from './pages/Index';
 import ActionItems from './pages/ActionItems';
 import Settings from './pages/Settings';
 import Meetings from './pages/Meetings';
+import MeetingDetails from './pages/MeetingDetails';
 import Committees from './pages/Committees';
 import NotFound from './pages/NotFound';
 import { Toaster } from '@/components/ui/toaster';
@@ -27,6 +28,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Index />} />
               <Route path="/meetings" element={<Meetings />} />
+              <Route path="/meetings/:id" element={<MeetingDetails />} />
               <Route path="/committees" element={<Committees />} />
               <Route path="/documents" element={<Documents />} />
               <Route path="/action-items" element={<ActionItems />} />

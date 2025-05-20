@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Database } from "@/integrations/supabase/types";
+import { useNavigate } from "react-router-dom";
 
 // Define the Meeting type with correct structure
 type Meeting = Database['public']['Tables']['meetings']['Row'] & {
@@ -24,6 +25,8 @@ interface MeetingCardProps {
 }
 
 const MeetingCard = ({ meeting }: MeetingCardProps) => {
+  const navigate = useNavigate();
+
   const getMeetingStatusColor = (status: string) => {
     switch (status) {
       case 'scheduled':
@@ -39,8 +42,15 @@ const MeetingCard = ({ meeting }: MeetingCardProps) => {
     }
   };
 
+  const handleClick = () => {
+    navigate(`/meetings/${meeting.id}`);
+  };
+
   return (
-    <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+    <Card 
+      className="shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleClick}
+    >
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-blue-600" />

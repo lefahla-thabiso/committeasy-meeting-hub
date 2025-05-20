@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import StatsOverview from "@/components/dashboard/StatsOverview";
 import CalendarView from "@/components/dashboard/CalendarView";
 import ActionItemsWidget from "@/components/dashboard/ActionItemsWidget";
@@ -10,13 +10,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Database } from "@/integrations/supabase/types";
+import { useNavigate } from "react-router-dom";
+
+// Define the Meeting type with Supabase structure
+type Meeting = Database['public']['Tables']['meetings']['Row'] & {
+  organizer?: {
+    name: string;
+    avatar: string | null;
+  } | null;
+  committee?: {
+    name: string;
+  } | null;
+};
 
 interface DashboardProps {
-  upcomingMeetings?: any[];
+  upcomingMeetings?: Meeting[];
   loading?: boolean;
 }
 
 const Dashboard = ({ upcomingMeetings = [], loading = false }: DashboardProps) => {
+  const navigate = useNavigate();
+
+  const handleMeetingClick = (meetingId: string) => {
+    navigate(`/meetings/${meetingId}`);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -59,7 +78,11 @@ const Dashboard = ({ upcomingMeetings = [], loading = false }: DashboardProps) =
                 <div className="space-y-4">
                   {upcomingMeetings.length > 0 ? (
                     upcomingMeetings.map((meeting) => (
-                      <div key={meeting.id} className="border-b pb-3 last:border-b-0">
+                      <div 
+                        key={meeting.id} 
+                        className="border-b pb-3 last:border-b-0 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
+                        onClick={() => handleMeetingClick(meeting.id)}
+                      >
                         <div className="font-medium">{meeting.title}</div>
                         <div className="text-sm text-gray-500 flex items-center space-x-1 justify-between">
                           <div>{format(new Date(meeting.start_time), "MMM d, h:mm a")}</div>
