@@ -1,24 +1,17 @@
 
 import React from "react";
-import MobileMenu from "./MobileMenu";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UserMenu from "./UserMenu";
 
-interface TopNavProps {
-  sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
-}
-
-const TopNav = ({ sidebarOpen, setSidebarOpen }: TopNavProps) => {
+const TopNav = () => {
   return (
     <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white shadow">
-      <MobileMenu
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        className="border-r border-gray-200 px-4 md:hidden"
-      />
+      <div className="md:hidden border-r border-gray-200 px-4">
+        <SidebarTrigger className="h-16 flex items-center" />
+      </div>
       <div className="flex flex-1 justify-between px-4">
         <div className="flex flex-1">
           <div className="flex w-full md:ml-0">

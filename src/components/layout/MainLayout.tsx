@@ -1,5 +1,6 @@
 
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "./Sidebar";
 import TopNav from "./TopNav";
 
@@ -8,18 +9,18 @@ interface MainLayoutProps {
 }
 
 const MainLayout = ({ children }: MainLayoutProps) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <TopNav sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          {children}
-        </main>
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-50">
+        <Sidebar />
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <TopNav />
+          <main className="flex-1 overflow-y-auto p-4 md:p-6">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
