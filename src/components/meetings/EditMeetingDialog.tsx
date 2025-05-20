@@ -226,14 +226,14 @@ const EditMeetingDialog = ({ open, onOpenChange, meeting, onSuccess }: EditMeeti
             <div className="grid gap-2">
               <Label htmlFor="committee">Committee</Label>
               <Select
-                value={committeeId || ""}
-                onValueChange={(value) => setCommitteeId(value || null)}
+                value={committeeId || "none"}
+                onValueChange={(value) => setCommitteeId(value === "none" ? null : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select committee (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {committees.map((committee) => (
                     <SelectItem key={committee.id} value={committee.id}>
                       {committee.name}
