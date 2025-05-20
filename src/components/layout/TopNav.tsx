@@ -1,6 +1,6 @@
 
 import React from "react";
-import { MobileMenu } from "@/components/ui/sidebar";
+import MobileMenu from "./MobileMenu";
 import { Input } from "@/components/ui/input";
 import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
